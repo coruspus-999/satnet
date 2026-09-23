@@ -1,0 +1,28 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: satnet
+      MYSQL_USER: satnet
+      MYSQL_PASSWORD: satnet
+      MYSQL_ROOT_PASSWORD: change-root-password
+    ports:
+      - "3306:3306"
+    volumes:
+      - satnet_mysql:/var/lib/mysql
+
+  backend:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile.backend
+    environment:
+      DATABASE_URL: mysql+pymysql://satnet:satnet@mysql:3306/satnet
+      CORS_ORIGINS: http://localhost:5173
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+
+volumes:
+  satnet_mysql:
